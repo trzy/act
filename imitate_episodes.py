@@ -42,12 +42,12 @@ def main(args):
         from aloha_scripts.constants import TASK_CONFIGS
         task_config = TASK_CONFIGS[task_name]
     dataset_dir = task_config['dataset_dir']
-    num_episodes = task_config['num_episodes']
+    num_episodes = 2#task_config['num_episodes']
     episode_len = task_config['episode_len']
     camera_names = task_config['camera_names']
 
     # fixed parameters
-    state_dim = 14
+    state_dim = 5#14
     lr_backbone = 1e-5
     backbone = 'resnet18'
     if policy_class == 'ACT':
