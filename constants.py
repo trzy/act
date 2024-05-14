@@ -30,6 +30,13 @@ SIM_TASK_CONFIGS = {
         'episode_len': 500,
         'camera_names': ['top']
     },
+
+    'sim_bottlecap_desk': {
+        'dataset_dir': DATA_DIR + '/bottlecap_desk',
+        'num_episodes': 44,
+        'episode_len': 500,
+        'camera_names': ['top']
+    }
 }
 
 ### Simulation envs fixed constants
