@@ -34,7 +34,14 @@ SIM_TASK_CONFIGS = {
     'sim_bottlecap_desk': {
         'dataset_dir': DATA_DIR + '/bottlecap_desk',
         'num_episodes': 44,
-        'episode_len': 500,
+        'episode_len': 359,
+        'camera_names': ['top']
+    },
+
+    'sim_bottlecap_desk_truncated': {
+        'dataset_dir': DATA_DIR + '/bottlecap_desk_truncated',
+        'num_episodes': 44,
+        'episode_len': 135,
         'camera_names': ['top']
     }
 }

@@ -109,6 +109,7 @@ def get_image(ts, camera_names):
     return curr_image
 
 def _prepare_image(frame: np.ndarray) -> torch.Tensor:
+    frame = frame.transpose([2, 0, 1])  # (height,width,channels) -> (channels,height,width)
     frame = np.stack([ frame ], axis=0)
     return torch.from_numpy(frame / 255.0).float().cuda().unsqueeze(0)
 
@@ -141,8 +142,6 @@ async def infer_loop(config, ckpt_name, input_queue: asyncio.Queue, output_queue
     pre_process = lambda s_qpos: (s_qpos - stats['qpos_mean']) / stats['qpos_std']
     post_process = lambda a: a * stats['action_std'] + stats['action_mean']
 
-    num_queries = 1
-    query_frequency=1
     query_frequency = policy_config['num_queries']
     if temporal_agg:
         query_frequency = 1
@@ -168,7 +167,11 @@ async def infer_loop(config, ckpt_name, input_queue: asyncio.Queue, output_queue
             ### query policy
             if config['policy_class'] == "ACT":
                 if t % query_frequency == 0:
+                    print(f"t={t} infer (query_frequency={query_frequency})")
                     all_actions = policy(qpos, curr_image)
+                    # print("Inference:")
+                    # for action in all_actions:
+                    #     print(post_process(action.cpu()))
                 if temporal_agg:
                     all_time_actions[[t], t:t+num_queries] = all_actions
                     actions_for_curr_step = all_time_actions[:, t]
@@ -181,6 +184,7 @@ async def infer_loop(config, ckpt_name, input_queue: asyncio.Queue, output_queue
                     raw_action = (actions_for_curr_step * exp_weights).sum(dim=0, keepdim=True)
                 else:
                     raw_action = all_actions[:, t % query_frequency]
+                    print(f"t={t} sample {t%query_frequency}")
             elif config['policy_class'] == "CNNMLP":
                 raw_action = policy(qpos, curr_image)
             else:
@@ -190,7 +194,6 @@ async def infer_loop(config, ckpt_name, input_queue: asyncio.Queue, output_queue
             raw_action = raw_action.squeeze(0).cpu().numpy()
             action = post_process(raw_action)
             target_qpos = action
-            print(f"Target action: {action}")
 
             # Send
             await output_queue.put(target_qpos)
@@ -254,9 +257,8 @@ class InferenceServer(MessageHandler):
     
     @handler(InferenceRequestMessage)
     async def handle_InferenceRequestMessage(self, session: Session, msg: InferenceRequestMessage, timestamp: float):
-        frame = np.frombuffer(buffer=base64.b64decode(msg.frame), dtype=np.uint8).reshape((3, 480, 640)) 
+        frame = np.frombuffer(buffer=base64.b64decode(msg.frame), dtype=np.uint8).reshape((480, 640, 3))
         motor_radians = np.array(msg.motor_radians)
-        print(f"Received inference request: motor_radians={msg.motor_radians}")
         await self._input_queue.put(Observation(qpos=motor_radians, image=frame))
 
 
