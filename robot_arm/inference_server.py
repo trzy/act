@@ -158,6 +158,12 @@ async def infer_loop(config, ckpt_name, input_queue: asyncio.Queue, output_queue
         while True:
             # Get observation
             observation = await input_queue.get()
+            if not isinstance(observation, Observation):
+                # Reset state
+                t = 0
+                if temporal_agg:
+                    all_time_actions = torch.zeros([max_timesteps, max_timesteps+num_queries, state_dim]).cuda()
+                continue
             qpos_numpy = observation.qpos
             curr_image = _prepare_image(frame=observation.image)
 
@@ -214,6 +220,7 @@ from pydantic import BaseModel
 
 from robot_arm.networking import handler, MessageHandler, Session, TCPServer
 
+# HelloMessage is also used to reset inference process
 class HelloMessage(BaseModel):
     message: str
 
@@ -254,6 +261,7 @@ class InferenceServer(MessageHandler):
     @handler(HelloMessage)
     async def handle_HelloMessage(self, session: Session, msg: HelloMessage, timestamp: float):
         print("Hello received: %s" % msg.message)
+        await self._input_queue.put(msg)
     
     @handler(InferenceRequestMessage)
     async def handle_InferenceRequestMessage(self, session: Session, msg: InferenceRequestMessage, timestamp: float):
