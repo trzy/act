@@ -39,12 +39,13 @@ def force_length(dataset, new_length, pad_strategy: str):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser("extract_episodes")
   parser.add_argument("--dir", metavar="path", action="store", required=True, type=str, help="Directory of robot-arm data recording")
-  parser.add_argument("--pad", metavar="strategy", action="store", default="zero", type=str, help="Pad each episode to length of longest episode ('zero' or 'last')")
+  parser.add_argument("--pad", metavar="strategy", action="store", type=str, help="Pad each episode to length of longest episode ('zero' or 'last')")
   parser.add_argument("--truncate", action="store_true", help="Truncate each episode to the length of the smallest episodes")
   parser.add_argument("--fixed-length", action="store", type=int, help="Length to force each episode to, truncating those above and padding those above")
   options = parser.parse_args()
 
-  assert options.pad in [ "zero", "last" ]
+  if options.pad:
+    assert options.pad in [ "zero", "last" ]
 
   print("Analyzing episodes...")
   dirs = [ os.path.join(options.dir, dir) for dir in os.listdir(options.dir) if dir.startswith("example-") and os.path.isdir(os.path.join(options.dir, dir)) ]
@@ -79,12 +80,18 @@ if __name__ == "__main__":
         qpos = truncate(dataset=fp["/observations/qpos"], new_length=min_length)
         qvel = truncate(dataset=fp["/observations/qvel"], new_length=min_length)
         images = truncate(dataset=fp["/observations/images/top"], new_length=min_length)
-      else:
+      elif options.pad is not None:
         # Pad to max
         actions = pad(dataset=fp["/action"], new_length=max_length, strategy=options.pad)
         qpos = pad(dataset=fp["/observations/qpos"], new_length=max_length, strategy=options.pad)
         qvel = pad(dataset=fp["/observations/qvel"], new_length=max_length, strategy=options.pad)
         images = pad(dataset=fp["/observations/images/top"], new_length=max_length, strategy=options.pad)
+      else:
+        # No padding
+        actions = fp["/action"]
+        qpos = fp["/observations/qpos"]
+        qvel = fp["/observations/qvel"]
+        images = fp["/observations/images/top"]
       with h5py.File(name=dest_file, mode="w", rdcc_nbytes=1024**2*2) as root:
         root.attrs['sim'] = False   # TODO: is this needed?
         follower = root.create_group("observations")
