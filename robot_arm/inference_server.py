@@ -279,19 +279,19 @@ if __name__ == '__main__':
     parser.add_argument('--ckpt_dir', action='store', type=str, help='ckpt_dir', required=True)
     parser.add_argument('--policy_class', action='store', type=str, default='ACT', help='policy_class, capitalize', required=True)
     parser.add_argument('--task_name', action='store', type=str, default='sim_bottlecap_desk', help='task_name', required=True)
-    parser.add_argument('--batch_size', action='store', type=int, help='batch_size', required=True)
-    parser.add_argument('--seed', action='store', type=int, help='seed', required=True)
+    parser.add_argument('--batch_size', action='store', type=int, help='batch_size', default=8, required=False)
+    parser.add_argument('--seed', action='store', type=int, help='seed', default=0, required=False)
 
     # for ACT
-    parser.add_argument('--kl_weight', action='store', type=int, help='KL Weight', required=False)
-    parser.add_argument('--chunk_size', action='store', type=int, help='chunk_size', required=False)
-    parser.add_argument('--hidden_dim', action='store', type=int, help='hidden_dim', required=False)
-    parser.add_argument('--dim_feedforward', action='store', type=int, help='dim_feedforward', required=False)
+    parser.add_argument('--kl_weight', action='store', type=int, help='KL Weight', default=10, required=False)
+    parser.add_argument('--chunk_size', action='store', type=int, help='chunk_size', default=100, required=False)
+    parser.add_argument('--hidden_dim', action='store', type=int, help='hidden_dim', default=512, required=False)
+    parser.add_argument('--dim_feedforward', action='store', type=int, help='dim_feedforward', default=3200, required=False)
     parser.add_argument('--temporal_agg', action='store_true')
 
     # Unused but some modules depend on it
-    parser.add_argument('--num_epochs', action='store', type=int, help='num_epochs', required=True)
-    parser.add_argument('--lr', action='store', type=float, help='lr', required=True)
+    parser.add_argument('--num_epochs', action='store', type=int, help='num_epochs', default=2000, required=False)
+    parser.add_argument('--lr', action='store', type=float, help='lr', default=1e-5, required=False)
 
     options = parser.parse_args()
 
