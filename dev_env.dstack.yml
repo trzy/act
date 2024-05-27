@@ -20,8 +20,10 @@ setup:
  - cd act && git checkout bart/robot-arm
  - pip install -r requirements.txt && cd detr && pip install -e .
  - apt update -y
+ - apt install vim -y
  - apt install unzip -y
  - apt install libgl1-mesa-glx -y
+ - apt install zip -y
 # - mkdir data/default
 # - wget --content-disposition "https://www.dropbox.com/scl/fi/l4fpgiztfk22vvrnk5318/cube-black_background-190_zeropad.zip?rlkey=9bp3jp48duytt55j7bppt5nyo&st=23ax32io&dl=1"
 # - unzip unspecified -d data/default/
