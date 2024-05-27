@@ -47,8 +47,8 @@ SIM_TASK_CONFIGS = {
 
     'sim_cube_1': {
         'dataset_dir': DATA_DIR + '/cube.1',
-        'num_episodes': 48,
-        'episode_len': 155,
+        'num_episodes': 150,
+        'episode_len': 104,
         'camera_names': ['top']
     }
 }
