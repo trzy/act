@@ -51,6 +51,13 @@ SIM_TASK_CONFIGS = {
         'episode_len': 104,
         'camera_names': ['top']
     }
+    
+    'sim_cube_3': {
+        'dataset_dir': DATA_DIR + '/cube.3',
+        'num_episodes': 262,
+        'episode_len': 102,
+        'camera_names': ['top']
+    }
 }
 
 ### Simulation envs fixed constants
