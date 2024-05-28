@@ -64,7 +64,14 @@ SIM_TASK_CONFIGS = {
         'num_episodes': 118,
         'episode_len': 101,
         'camera_names': ['top']
-    }
+    },
+
+    'sim_finc_usb': {
+        'dataset_dir': DATA_DIR + '/usb',
+        'num_episodes': 90,
+        'episode_len': 114,
+        'camera_names': ['top']
+    },
 }
 
 ### Simulation envs fixed constants
