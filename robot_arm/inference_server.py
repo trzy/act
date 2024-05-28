@@ -1,6 +1,7 @@
 import asyncio
 from dataclasses import dataclass
 
+import cv2
 import torch
 import numpy as np
 import os
@@ -143,6 +144,7 @@ async def infer_loop(config, ckpt_name, input_queue: asyncio.Queue, output_queue
     post_process = lambda a: a * stats['action_std'] + stats['action_mean']
 
     query_frequency = policy_config['num_queries']
+    #query_frequency = 20
     if temporal_agg:
         query_frequency = 1
         num_queries = policy_config['num_queries']
@@ -230,7 +232,7 @@ class InferenceRequestMessage(BaseModel):
 
 class InferenceResponseMessage(BaseModel):
     target_motor_radians: Annotated[List[float], Len(min_length=5, max_length=5)]
-      
+
 class InferenceServer(MessageHandler):
     def __init__(self, port: int, input_queue: asyncio.Queue, output_queue: asyncio.Queue):
         super().__init__()
@@ -241,7 +243,7 @@ class InferenceServer(MessageHandler):
 
     async def run(self):
         await asyncio.gather(self._server.run(), self._send_results())
-        
+
     async def _send_results(self):
         while True:
             target_motor_radians = await self._output_queue.get()
@@ -253,19 +255,21 @@ class InferenceServer(MessageHandler):
         print("Connection from: %s" % session.remote_endpoint)
         await session.send(HelloMessage(message = "Hello from ACT inference server"))
         self.sessions.add(session)
-    
+
     async def on_disconnect(self, session: Session):
         print("Disconnected from: %s" % session.remote_endpoint)
         self.sessions.remove(session)
-    
+
     @handler(HelloMessage)
     async def handle_HelloMessage(self, session: Session, msg: HelloMessage, timestamp: float):
         print("Hello received: %s" % msg.message)
         await self._input_queue.put(msg)
-    
+
     @handler(InferenceRequestMessage)
     async def handle_InferenceRequestMessage(self, session: Session, msg: InferenceRequestMessage, timestamp: float):
-        frame = np.frombuffer(buffer=base64.b64decode(msg.frame), dtype=np.uint8).reshape((480, 640, 3))
+        #frame = np.frombuffer(buffer=base64.b64decode(msg.frame), dtype=np.uint8).reshape((480, 640, 3))
+        jpeg = np.frombuffer(buffer=base64.b64decode(msg.frame), dtype=np.uint8)
+        frame = cv2.imdecode(jpeg, cv2.IMREAD_COLOR)
         motor_radians = np.array(msg.motor_radians)
         await self._input_queue.put(Observation(qpos=motor_radians, image=frame))
 
