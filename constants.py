@@ -61,8 +61,8 @@ SIM_TASK_CONFIGS = {
 
     'sim_finc_cube': {
         'dataset_dir': DATA_DIR + '/cube',
-        'num_episodes': 123,
-        'episode_len': 95,
+        'num_episodes': 118,
+        'episode_len': 101,
         'camera_names': ['top']
     }
 }
