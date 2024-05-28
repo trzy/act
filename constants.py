@@ -72,6 +72,13 @@ SIM_TASK_CONFIGS = {
         'episode_len': 114,
         'camera_names': ['top']
     },
+
+    'sim_finc_cylinder': {
+        'dataset_dir': DATA_DIR + '/cylinder',
+        'num_episodes': 98,
+        'episode_len': 102,
+        'camera_names': ['top']
+    },
 }
 
 ### Simulation envs fixed constants
