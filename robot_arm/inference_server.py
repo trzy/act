@@ -290,7 +290,7 @@ if __name__ == '__main__':
     parser.add_argument('--kl_weight', action='store', type=int, help='KL Weight', default=10, required=False)
     parser.add_argument('--chunk_size', action='store', type=int, help='chunk_size', default=100, required=False)
     parser.add_argument('--hidden_dim', action='store', type=int, help='hidden_dim', default=512, required=False)
-    parser.add_argument('--dim_feedforward', action='store', type=int, help='dim_feedforward', default=3200, required=False)
+    parser.add_argument('--dim_feedforward', action='store', type=int, help='dim_feedforward', default=32000, required=False)
     parser.add_argument('--temporal_agg', action='store_true')
 
     # Unused but some modules depend on it
@@ -303,7 +303,7 @@ if __name__ == '__main__':
     output_queue = asyncio.Queue()
 
     tasks = []
-    server = InferenceServer(port=8000, input_queue=input_queue, output_queue=output_queue)
+    server = InferenceServer(port=8002, input_queue=input_queue, output_queue=output_queue)
     loop = asyncio.new_event_loop()
     tasks.append(loop.create_task(server.run()))
     tasks.append(loop.create_task(main(vars(options), input_queue=input_queue, output_queue=output_queue)))
